@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alsalmo BuildCorp — Building Trust. Delivering Quality.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+<style>
+  :root {
+    --blue: #0078D4;
+    --blue-light: #1a8fe0;
+    --blue-dark: #005a9e;
+    --steel: #1a1f2e;
+    --steel-mid: #252c3d;
+    --steel-light: #2f3850;
+    --cream: #f5f0e8;
+    --warm: #e8e0d0;
+    --white: #ffffff;
+    --text-muted: #8a9bb0;
+    --gold: #c9a84c;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: auto; } /* GSAP handles smooth scroll */
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--steel);
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ── CUSTOM SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--steel); }
+  ::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 10px; }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.025;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5vw;
+    height: 70px;
+    background: rgba(26,31,46,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,120,212,0.18);
+    transition: background 0.4s, box-shadow 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(13,16,24,0.97);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 0;
+  }
+  .nav-logo span { color: var(--blue); }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    color: var(--text-muted); text-decoration: none;
+    font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase;
+    font-weight: 500;
+    position: relative;
+    transition: color 0.25s;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -3px; left: 0; right: 0;
+    height: 1px; background: var(--blue);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { transform: scaleX(1); }
+  .nav-cta {
+    background: var(--blue) !important; color: var(--white) !important;
+    padding: 0.45rem 1.3rem; border-radius: 3px;
+    font-weight: 600 !important;
+  }
+  .nav-cta::after { display: none !important; }
+  .nav-cta:hover { background: var(--blue-light) !important; color: var(--white) !important; opacity:0.95; }
+
+  /* Hamburger */
+  .hamburger {
+    display: none; flex-direction: column; gap: 5px; cursor: pointer;
+    padding: 4px; background: none; border: none;
+  }
+  .hamburger span {
+    display: block; width: 24px; height: 2px;
+    background: var(--white); border-radius: 2px;
+    transition: all 0.3s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-menu {
+    display: none; position: fixed; inset: 70px 0 0 0; z-index: 998;
+    background: rgba(13,16,24,0.98); backdrop-filter: blur(20px);
+    flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.35s;
+  }
+  .mobile-menu.open { opacity: 1; pointer-events: all; }
+  .mobile-menu a {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem; letter-spacing: 0.08em;
+    color: var(--white); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .mobile-menu a:hover { color: var(--blue); }
+  .mobile-menu a.cta-mobile {
+    background: var(--blue); color: var(--white) !important;
+    padding: 0.7rem 2.5rem; border-radius: 3px;
+    font-size: 1.4rem;
+  }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+    padding-top: 70px;
+  }
+
+  /* Animated background grid lines */
+  .hero-grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,120,212,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,120,212,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none; z-index: 0;
+  }
+
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 6rem 5vw 6rem 8vw;
+    position: relative; z-index: 2;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(0,120,212,0.12); border: 1px solid rgba(0,120,212,0.3);
+    border-radius: 2px; padding: 0.35rem 0.9rem;
+    font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--blue); width: fit-content; margin-bottom: 2rem;
+    opacity: 0; transform: translateY(20px);
+  }
+  .hero-badge::before { content: ''; width: 6px; height: 6px; background: var(--blue); border-radius: 50%; animation: pulseDot 2s infinite; }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.5rem, 6vw, 6.5rem);
+    line-height: 0.93;
+    letter-spacing: 0.02em;
+    color: var(--white);
+    opacity: 0; transform: translateY(30px);
+    overflow: hidden;
+  }
+  .hero-title .accent { color: var(--blue); }
+  .hero-tagline {
+    margin-top: 1.8rem;
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--gold);
+    letter-spacing: 0.01em;
+    opacity: 0; transform: translateY(20px);
+  }
+  .hero-desc {
+    margin-top: 1.4rem;
+    font-size: 0.95rem; line-height: 1.85;
+    color: var(--text-muted); max-width: 440px;
+    opacity: 0; transform: translateY(20px);
+  }
+  .hero-btns {
+    margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap;
+    opacity: 0; transform: translateY(20px);
+  }
+
+  .btn-primary {
+    background: var(--blue); color: var(--white);
+    padding: 0.9rem 2.2rem; border: none; border-radius: 3px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
+    font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+    cursor: pointer; text-decoration: none;
+    position: relative; overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: inline-block;
+  }
+  .btn-primary::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,120,212,0.4); }
+  .btn-primary:hover::after { transform: translateX(100%); }
+  .btn-outline {
+    background: transparent; color: var(--white);
+    padding: 0.9rem 2.2rem; border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 3px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 500; letter-spacing: 0.07em;
+    text-transform: uppercase; cursor: pointer; text-decoration: none;
+    transition: border-color 0.25s, color 0.25s, background 0.25s;
+    display: inline-block;
+  }
+  .btn-outline:hover { border-color: var(--blue); color: var(--blue); background: rgba(0,120,212,0.06); }
+
+  .hero-right {
+    position: relative; overflow: hidden;
+  }
+  .hero-right::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(26,31,46,0.85) 0%, rgba(0,120,212,0.08) 100%);
+    z-index: 1;
+  }
+  .hero-img-grid {
+    position: absolute; inset: 0;
+    display: grid; grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 3px;
+  }
+  .hero-img-cell {
+    position: relative;
+    display: block;
+    background-color: #0f1726;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    border-radius: 22px;
+    min-height: 210px;
+    transition: transform 0.4s ease;
+  }
+  .hero-img-cell.hero-img-1 { background-image: url('https://i.pinimg.com/1200x/d2/6f/2e/d26f2ed025f11b5c3e355c40ff4d6717.jpg'); }
+  .hero-img-cell.hero-img-2 { background-image: url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80'); }
+  .hero-img-cell.hero-img-3 { background-image: url('https://images.unsplash.com/photo-1481277542470-605612bd2d61?auto=format&fit=crop&w=1200&q=80'); }
+  .hero-img-cell.hero-img-4 { background-image: url('https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80'); }
+  .hero-img-cell::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(10,15,28,0.08) 0%, rgba(10,15,28,0.72) 100%);
+    pointer-events: none;
+  }
+  .hero-img-cell:hover { transform: translateY(-3px); }
+  .icon-svg {
+    width: 1.25rem; height: 1.25rem;
+    color: var(--blue);
+    display: inline-flex;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .icon-inline {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.5rem; height: 1.5rem;
+    color: var(--blue);
+  }
+  .hero-icon { opacity: 0.18; width: 70%; max-width: 120px; }
+
+  .hero-stats {
+    position: absolute; bottom: 2.5rem; left: 2rem; right: 2rem;
+    z-index: 2;
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 1px;
+    background: rgba(0,120,212,0.2); border: 1px solid rgba(0,120,212,0.25);
+    border-radius: 4px; overflow: hidden;
+    opacity: 0;
+  }
+  .hero-stat {
+    background: rgba(26,31,46,0.88); padding: 1.2rem 1rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+  }
+  .hero-stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem; color: var(--blue); line-height: 1;
+  }
+  .hero-stat-label {
+    font-size: 0.68rem; color: var(--text-muted);
+    letter-spacing: 0.06em; text-transform: uppercase; margin-top: 0.25rem;
+  }
+
+  .scroll-cue {
+    position: absolute; bottom: 2rem; left: 8vw;
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    z-index: 3; opacity: 0;
+  }
+  .scroll-cue span { font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .scroll-bar {
+    width: 1px; height: 50px;
+    background: linear-gradient(to bottom, var(--blue), transparent);
+    animation: scrollPulse 1.8s infinite;
+  }
+
+  /* Geometric bg */
+  .geo { position: absolute; pointer-events: none; }
+  .geo-1 {
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    border: 1px solid rgba(0,120,212,0.07);
+    border-radius: 50%;
+  }
+  .geo-2 {
+    bottom: 10%; left: 4vw;
+    width: 130px; height: 130px;
+    border: 1px solid rgba(0,120,212,0.1);
+    transform: rotate(30deg);
+  }
+  .geo-3 {
+    top: 30%; right: 5%;
+    width: 60px; height: 60px;
+    background: rgba(0,120,212,0.06);
+    transform: rotate(45deg);
+  }
+
+  /* ── SHARED SECTION ── */
+  section { padding: 7rem 8vw; }
+  .section-label {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--blue); font-weight: 600; margin-bottom: 1rem;
+  }
+  .section-label::before { content: ''; display: block; width: 28px; height: 2px; background: var(--blue); }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.2rem, 4vw, 4rem);
+    line-height: 0.97; letter-spacing: 0.02em;
+    color: var(--white);
+  }
+  .section-title .accent { color: var(--blue); }
+
+  /* ── ABOUT ── */
+  #about {
+    background: var(--steel-mid);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 5rem;
+    align-items: center;
+    position: relative; overflow: hidden;
+  }
+  #about::before {
+    content: '';
+    position: absolute; top: -200px; left: -200px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,120,212,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .about-visual { position: relative; }
+  .about-card-main {
+    background: var(--steel-light);
+    border: 1px solid rgba(0,120,212,0.15);
+    border-radius: 8px;
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .about-image {
+    overflow: hidden;
+    border-radius: 18px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.22);
+    min-height: 320px;
+    background-image: url('https://i.pinimg.com/1200x/ac/f3/1d/acf31dfdfb7b3b5a0c30d6ffab1e86b4.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .about-card-main::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 60px; height: 3px;
+    background: var(--blue);
+  }
+  .about-big-letter {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 9rem; line-height: 1;
+    color: rgba(0,120,212,0.06);
+    position: absolute; right: -1rem; top: -1.5rem;
+    pointer-events: none; user-select: none;
+    letter-spacing: -0.02em;
+  }
+  .about-pillars {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;
+  }
+  .about-pillar {
+    background: rgba(0,120,212,0.06); border: 1px solid rgba(0,120,212,0.12);
+    border-radius: 6px; padding: 1rem;
+    transition: border-color 0.3s, background 0.3s, transform 0.3s;
+  }
+  .about-pillar:hover {
+    border-color: rgba(0,120,212,0.35);
+    background: rgba(0,120,212,0.1);
+    transform: translateY(-2px);
+  }
+  .pillar-icon { font-size: 1.4rem; margin-bottom: 0.4rem; }
+  .pillar-name { font-size: 0.78rem; font-weight: 700; color: var(--white); }
+  .pillar-desc { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; line-height: 1.5; }
+
+  .about-content .section-title { margin-bottom: 1.5rem; }
+  .about-content p {
+    color: var(--text-muted); font-size: 0.95rem; line-height: 1.9;
+    margin-bottom: 1rem;
+  }
+  .about-content p strong { color: var(--white); }
+  .about-highlights { display: flex; gap: 2.5rem; margin-top: 2rem; flex-wrap: wrap; }
+  .about-hl { display: flex; flex-direction: column; }
+  .about-hl-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem; color: var(--blue); line-height: 1;
+  }
+  .about-hl-txt { font-size: 0.73rem; color: var(--text-muted); letter-spacing: 0.04em; text-transform: uppercase; margin-top: 0.2rem; }
+
+  /* ── SERVICES ── */
+  #services { background: var(--steel); position: relative; overflow: hidden; }
+  #services::after {
+    content: '';
+    position: absolute; bottom: -200px; right: -200px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,120,212,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .services-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3.5rem; flex-wrap: wrap; gap: 1.5rem; }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5px;
+    background: rgba(0,120,212,0.08);
+    border: 1px solid rgba(0,120,212,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .service-card {
+    background: var(--steel-mid);
+    padding: 2.2rem 2rem;
+    position: relative; overflow: hidden;
+    cursor: default;
+    transition: background 0.35s;
+  }
+  .service-card::after {
+    content: ''; position: absolute; bottom: 0; left: 0;
+    width: 0; height: 2px; background: var(--blue);
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .service-card:hover { background: var(--steel-light); }
+  .service-card:hover::after { width: 100%; }
+  .service-card:hover .service-num { color: var(--blue); }
+  .service-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.8rem; letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.12); margin-bottom: 1.2rem;
+    transition: color 0.3s;
+  }
+  .service-icon-wrap {
+    width: 48px; height: 48px;
+    background: rgba(0,120,212,0.1);
+    border: 1px solid rgba(0,120,212,0.2);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; margin-bottom: 1.2rem;
+    transition: background 0.3s, transform 0.3s;
+  }
+  .service-card:hover .service-icon-wrap { background: rgba(0,120,212,0.22); transform: scale(1.08); }
+  .service-name { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 0.6rem; }
+  .service-desc { font-size: 0.83rem; color: var(--text-muted); line-height: 1.75; }
+
+  /* ── STATS ── */
+  #stats {
+    background: var(--blue);
+    padding: 5rem 8vw;
+    position: relative; overflow: hidden;
+  }
+  #stats::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+  .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; position: relative; z-index: 1; }
+  .stat-item {
+    text-align: center; padding: 2.5rem 1rem;
+    background: rgba(0,0,0,0.1);
+    border-right: 1px solid rgba(255,255,255,0.08);
+    position: relative; overflow: hidden;
+  }
+  .stat-item::before {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 0; height: 2px; background: rgba(255,255,255,0.5);
+    transition: width 0.4s;
+  }
+  .stat-item:hover::before { width: 60%; }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.8rem; color: var(--white); line-height: 1;
+    display: block;
+  }
+  .stat-suffix { color: rgba(255,255,255,0.7); font-size: 2.8rem; }
+  .stat-name { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-top: 0.5rem; }
+
+  /* ── SERVICE AREAS ── */
+  #areas { background: var(--steel-mid); position: relative; overflow: hidden; }
+  .areas-inner { display: grid; grid-template-columns: 1fr 1.2fr; gap: 5rem; align-items: center; }
+  .areas-map {
+    background: linear-gradient(180deg, rgba(10,15,28,0.92), rgba(10,15,28,0.8)), url('https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80');
+    background-size: cover; background-position: center;
+    border: 1px solid rgba(0,120,212,0.15);
+    border-radius: 8px; padding: 2.5rem;
+    position: relative;
+    min-height: 340px;
+    display: flex; flex-direction: column; justify-content: center;
+    color: var(--white);
+  }
+  .map-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem; color: var(--white); letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+    display: inline-flex; align-items: center; gap: 0.6rem;
+  }
+  .map-title .icon-inline { color: var(--blue); }
+  .area-chips { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+  .area-chip {
+    display: flex; align-items: center; gap: 0.5rem;
+    background: rgba(0,120,212,0.1); border: 1px solid rgba(0,120,212,0.25);
+    border-radius: 3px; padding: 0.6rem 1.1rem;
+    font-size: 0.85rem; font-weight: 500; color: var(--white);
+    transition: background 0.25s, transform 0.25s;
+    cursor: default;
+  }
+  .area-chip:hover { background: rgba(0,120,212,0.22); transform: translateY(-2px); }
+  .area-chip-dot { width: 7px; height: 7px; background: var(--blue); border-radius: 50%; animation: pulseDot 2s infinite; flex-shrink: 0; }
+  .areas-text .section-title { margin-bottom: 1.5rem; }
+  .areas-text p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.9; margin-bottom: 1.5rem; }
+  .coverage-bar { margin-top: 2rem; }
+  .coverage-row { margin-bottom: 1.2rem; }
+  .coverage-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+  .coverage-label span:last-child { color: var(--blue); font-weight: 600; }
+  .coverage-track { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+  .coverage-fill { height: 100%; background: var(--blue); border-radius: 2px; width: 0; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+
+  /* ── PORTFOLIO ── */
+  #portfolio { background: var(--steel); }
+  .portfolio-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; flex-wrap: wrap; gap: 1.5rem; }
+  .portfolio-filter { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center; margin-bottom: 3.5rem; }
+  .filter-btn {
+    background: #1a1f2e; border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text-muted); padding: 0.65rem 1.8rem;
+    border-radius: 30px; font-size: 0.85rem; letter-spacing: 0.05em;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    font-weight: 500;
+  }
+  .filter-btn.active, .filter-btn:hover { 
+    background: #8b5cf6; 
+    border-color: #8b5cf6; 
+    color: var(--white); 
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
+    transform: translateY(-2px);
+  }
+  
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+  
+  .compare-card {
+    position: relative;
+    width: 100%;
+    height: 340px;
+    border-radius: 20px;
+    overflow: hidden;
+    user-select: none;
+    touch-action: pan-y;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+    background: var(--steel-mid);
+  }
+  .compare-card.hide { display: none; }
+  
+  .compare-img {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .compare-img::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+  }
+  
+  .compare-before {
+    clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+  }
+  .compare-after {
+    clip-path: inset(0 0 0 var(--pos));
+  }
+  
+  .compare-badge {
+    position: absolute;
+    top: 1.2rem;
+    padding: 0.4rem 1.4rem;
+    border-radius: 30px;
+    background: rgba(26, 31, 46, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .badge-before { left: 1.2rem; }
+  .badge-after { right: 1.2rem; background: rgba(139, 92, 246, 0.85); border-color: rgba(139, 92, 246, 0.4); }
+
+  .compare-label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 1.3rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+    z-index: 5;
+    pointer-events: none;
+    max-width: 40%;
+    line-height: 1.3;
+  }
+  .label-before { left: 1.5rem; }
+  .label-after { right: 1.5rem; text-align: right; }
+  
+  .compare-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--pos);
+    width: 3px;
+    background: #fff;
+    transform: translateX(-50%);
+    cursor: ew-resize;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  }
+  
+  .handle-circle {
+    width: 46px;
+    height: 46px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8b5cf6;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s cubic-bezier(0.4,0,0.2,1);
+  }
+  .compare-card:hover .handle-circle { transform: scale(1.15); }
+  
+  .handle-circle svg { width: 24px; height: 24px; stroke-width: 2.5; }
+
+  /* ── REGULAR PORTFOLIO GRID ── */
+  .regular-portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .portfolio-item {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    height: 300px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    cursor: pointer;
+    background: var(--steel-mid);
+  }
+  .portfolio-item-img {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .portfolio-item::after {
+    content: ''; 
+    position: absolute; 
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
+    opacity: 0.85;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .portfolio-item:hover .portfolio-item-img { transform: scale(1.08); }
+  .portfolio-item:hover::after { opacity: 1; }
+  
+  .portfolio-item-info {
+    position: absolute;
+    bottom: 24px; left: 24px; right: 24px;
+    z-index: 2;
+    transform: translateY(10px);
+    opacity: 0.9;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+  .portfolio-item:hover .portfolio-item-info {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  .portfolio-item-cat {
+    color: #8b5cf6;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .portfolio-item-title {
+    color: white;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  /* ── TESTIMONIALS ── */
+  #testimonials { background: var(--steel-mid); }
+  .testimonials-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
+  .testimonial-card {
+    background: var(--steel-light);
+    border: 1px solid rgba(0,120,212,0.1);
+    border-radius: 8px; padding: 2rem;
+    position: relative; overflow: hidden;
+    transition: border-color 0.3s, transform 0.35s;
+  }
+  .testimonial-card:hover { border-color: rgba(0,120,212,0.4); transform: translateY(-5px); }
+  .testimonial-card::before {
+    content: '"';
+    position: absolute; top: 0.5rem; right: 1.5rem;
+    font-family: 'DM Serif Display', serif;
+    font-size: 5.5rem; color: rgba(0,120,212,0.08);
+    line-height: 1;
+  }
+  .stars {
+    color: var(--blue);
+    display: flex;
+    gap: 0.3rem;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+  .stars .icon-svg { width: 1.1rem; height: 1.1rem; }
+  .stars .full-star path { fill: currentColor; stroke: currentColor; }
+  .stars .empty-star path { fill: none; stroke: currentColor; opacity: 0.45; }
+  .stars .half-star path { stroke: currentColor; }
+  .testimonial-text { font-size: 0.88rem; line-height: 1.85; color: var(--text-muted); margin-bottom: 1.5rem; font-style: italic; }
+  .testimonial-author { display: flex; align-items: center; gap: 0.8rem; }
+  .author-avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 1rem;
+    color: var(--white); flex-shrink: 0;
+    border: 1px solid rgba(0,120,212,0.3);
+  }
+  .author-name { font-size: 0.88rem; font-weight: 700; color: var(--white); }
+  .author-role { font-size: 0.72rem; color: var(--text-muted); }
+
+  /* ── QUOTE FORM ── */
+  #quote { background: var(--steel); position: relative; overflow: hidden; }
+  .quote-bg-accent {
+    position: absolute; right: -5rem; top: -5rem;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,120,212,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .quote-inner { display: grid; grid-template-columns: 1fr 1.6fr; gap: 5rem; align-items: start; position: relative; z-index: 1; }
+  .quote-info .section-title { margin-bottom: 1.5rem; }
+  .quote-info p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.85; margin-bottom: 2rem; }
+  .quote-perks { display: flex; flex-direction: column; gap: 0.9rem; }
+  .quote-perk { display: flex; align-items: center; gap: 0.8rem; font-size: 0.85rem; color: var(--text-muted); }
+  .perk-check {
+    width: 22px; height: 22px; background: rgba(0,120,212,0.12);
+    border: 1px solid rgba(0,120,212,0.3); border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; color: var(--blue); flex-shrink: 0;
+  }
+  .quote-form {
+    background: var(--steel-mid);
+    border: 1px solid rgba(0,120,212,0.15);
+    border-radius: 10px; padding: 2.8rem;
+    position: relative;
+  }
+  .quote-form::before {
+    content: 'GET A FREE QUOTE';
+    position: absolute; top: -1px; left: 2rem;
+    background: var(--blue); color: var(--white);
+    font-size: 0.65rem; letter-spacing: 0.12em;
+    padding: 0.3rem 0.9rem; border-radius: 0 0 4px 4px;
+    font-weight: 800;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .form-full { margin-bottom: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-group label {
+    font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-muted); font-weight: 600;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: var(--steel-light);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px; padding: 0.78rem 1rem;
+    color: var(--white); font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,120,212,0.1); }
+  .form-group select option { background: var(--steel-mid); }
+  .form-group textarea { resize: vertical; min-height: 90px; }
+  ::placeholder { color: rgba(138,155,176,0.45); }
+  .form-check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+  .form-check {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.8rem; color: var(--text-muted); cursor: pointer;
+  }
+  .form-check input[type="checkbox"] {
+    width: 15px; height: 15px; accent-color: var(--blue);
+    cursor: pointer; padding: 0; flex-shrink: 0;
+  }
+  .form-submit {
+    width: 100%; padding: 1rem;
+    background: var(--blue); color: var(--white);
+    border: none; border-radius: 4px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    cursor: pointer;
+    position: relative; overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 0.5rem;
+  }
+  .form-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,120,212,0.4); }
+  .form-success { display: none; text-align: center; padding: 2rem; }
+  .form-success.show { display: block; }
+  .success-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .success-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; color: var(--white); }
+  .success-msg { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem; line-height: 1.7; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #0d1018;
+    border-top: 1px solid rgba(0,120,212,0.1);
+    padding: 5rem 8vw 2.5rem;
+    position: relative; overflow: hidden;
+  }
+  footer::before {
+    content: '';
+    position: absolute; top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,120,212,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .footer-top { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3.5rem; position: relative; z-index: 1; }
+  .footer-brand-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem; letter-spacing: 0.05em;
+    color: var(--white); margin-bottom: 0.5rem;
+  }
+  .footer-brand-name span { color: var(--blue); }
+  .footer-tagline { font-style: italic; color: var(--gold); font-size: 0.85rem; font-family: 'DM Serif Display', serif; margin-bottom: 1rem; }
+  .footer-about { font-size: 0.82rem; color: var(--text-muted); line-height: 1.85; max-width: 260px; }
+  .footer-col-title { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--white); font-weight: 800; margin-bottom: 1.2rem; }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
+  .footer-links a { font-size: 0.82rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s, padding-left 0.2s; }
+  .footer-links a:hover { color: var(--blue); padding-left: 4px; }
+  .footer-contact { display: flex; flex-direction: column; gap: 0.8rem; }
+  .footer-contact-item { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.82rem; color: var(--text-muted); }
+  .fc-icon { color: var(--blue); flex-shrink: 0; margin-top: 2px; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 2rem; display: flex;
+    justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+    position: relative; z-index: 1;
+  }
+  .footer-copy { font-size: 0.78rem; color: var(--text-muted); }
+  .footer-copy strong { color: var(--white); }
+  .footer-legal { display: flex; gap: 1.5rem; }
+  .footer-legal a { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+  .footer-legal a:hover { color: var(--blue); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 1; transform: scaleY(1); }
+    50% { opacity: 0.3; transform: scaleY(0.7); }
+  }
+  @keyframes pulseDot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.6; }
+  }
+
+  /* GSAP initial states */
+  .gsap-reveal { opacity: 0; transform: translateY(40px); }
+  .gsap-reveal-left { opacity: 0; transform: translateX(-40px); }
+  .gsap-reveal-right { opacity: 0; transform: translateX(40px); }
+  .gsap-fade { opacity: 0; }
+  .gsap-scale { opacity: 0; transform: scale(0.93); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    #hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    #about { grid-template-columns: 1fr; gap: 3rem; }
+    .areas-inner { grid-template-columns: 1fr; gap: 3rem; }
+    .quote-inner { grid-template-columns: 1fr; gap: 3rem; }
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+    .testimonials-grid { grid-template-columns: 1fr 1fr; }
+    .stats-grid { grid-template-columns: repeat(2,1fr); }
+    .stat-item:nth-child(2) { border-right: none; }
+    .stat-item:nth-child(3) { border-top: 1px solid rgba(255,255,255,0.06); }
+    .stat-item:nth-child(4) { border-top: 1px solid rgba(255,255,255,0.06); }
+  }
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .mobile-menu { display: flex; }
+    section { padding: 5rem 5vw; }
+    #stats { padding: 4rem 5vw; }
+    .portfolio-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+    .form-row { grid-template-columns: 1fr; }
+    .form-check-grid { grid-template-columns: 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .footer-top { grid-template-columns: 1fr; }
+    .services-header { flex-direction: column; align-items: flex-start; }
+    .portfolio-header { flex-direction: column; align-items: flex-start; }
+    .hero-left { padding: 6rem 5vw 4rem; }
+    .quote-form { padding: 2rem 1.5rem; }
+    .about-pillars { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .hero-title { font-size: clamp(3rem, 15vw, 4rem); }
+    .compare-card { height: 280px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .about-highlights { gap: 1.5rem; }
+    .footer-legal { gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="closeMobile()">About</a>
+  <a href="#services" onclick="closeMobile()">Services</a>
+  <a href="#areas" onclick="closeMobile()">Areas</a>
+  <a href="#portfolio" onclick="closeMobile()">Portfolio</a>
+  <a href="#testimonials" onclick="closeMobile()">Reviews</a>
+  <a href="#quote" class="cta-mobile" onclick="closeMobile()">Get Quote</a>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="#hero" class="nav-logo">ALSALMO <span>BUILD</span>CORP</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#areas">Areas</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#quote" class="nav-cta">Get Quote</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMobile()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="geo geo-1"></div>
+  <div class="geo geo-2"></div>
+  <div class="geo geo-3"></div>
+
+  <div class="hero-left">
+    <div class="hero-badge" id="heroBadge">Toronto &amp; GTA's Trusted Builder</div>
+    <h1 class="hero-title" id="heroTitle">
+      ALSALMO<br><span class="accent">BUILD</span><br>CORP
+    </h1>
+    <p class="hero-tagline" id="heroTagline">Building Trust. Delivering Quality.</p>
+    <p class="hero-desc" id="heroDesc">A growing construction company led by experienced professionals committed to quality workmanship, timely delivery, and cost-effective solutions for every project.</p>
+    <div class="hero-btns" id="heroBtns">
+      <a href="#quote" class="btn-primary">Free Quotation</a>
+      <a href="#portfolio" class="btn-outline">Our Work</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-img-grid">
+      <div class="hero-img-cell hero-img-1"></div>
+      <div class="hero-img-cell hero-img-2"></div>
+      <div class="hero-img-cell hero-img-3"></div>
+      <div class="hero-img-cell hero-img-4"></div>
+    </div>
+    <div class="hero-stats" id="heroStats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">150+</div>
+        <div class="hero-stat-label">Projects Done</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">10+</div>
+        <div class="hero-stat-label">Years Experience</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">100%</div>
+        <div class="hero-stat-label">Client Satisfaction</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-cue" id="scrollCue">
+    <span>Scroll</span>
+    <div class="scroll-bar"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-visual gsap-reveal-left">
+    <div class="about-card-main">
+      <div class="about-big-letter">ABC</div>
+      <div class="about-image"></div>
+      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.85;margin-bottom:1.5rem;">
+        Alsalmo BuildCorp stands as a <strong style="color:var(--white)">trusted name</strong> across Toronto and the Greater Toronto Area, delivering exceptional construction outcomes for homeowners and businesses alike.
+      </p>
+      <div class="about-pillars">
+        <div class="about-pillar">
+          <div class="pillar-icon icon-inline">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 11c0-4.42 3.58-8 8-8s8 3.58 8 8v5H4v-5z"/><path d="M4 11h16"/><path d="M12 3v8"/></svg>
+          </div>
+          <div class="pillar-name">Expert Craftsmanship</div>
+          <div class="pillar-desc">Skilled tradespeople on every project</div>
+        </div>
+        <div class="about-pillar">
+          <div class="pillar-icon icon-inline">
+            <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 7v5l3 3"/><path d="M12 5a7 7 0 0 1 7 7"/></svg>
+          </div>
+          <div class="pillar-name">On-Time Delivery</div>
+          <div class="pillar-desc">We respect your timeline, always</div>
+        </div>
+        <div class="about-pillar">
+          <div class="pillar-icon icon-inline">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 8l6-4h8l4 4v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z"/><circle cx="8" cy="8" r="1.5"/><path d="M14 11h4"/></svg>
+          </div>
+          <div class="pillar-name">Cost Effective</div>
+          <div class="pillar-desc">Maximum value for your investment</div>
+        </div>
+        <div class="about-pillar">
+          <div class="pillar-icon icon-inline">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 12l3 3 4-4"/><path d="M13 12l3-3 3 3"/><path d="M8 15l2 2 3-3"/><path d="M12 9l2-2 3 3"/></svg>
+          </div>
+          <div class="pillar-name">Client First</div>
+          <div class="pillar-desc">Your vision, our commitment</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="about-content gsap-reveal-right">
+    <div class="section-label">Who We Are</div>
+    <h2 class="section-title">BUILT ON <span class="accent">TRUST.</span><br>DRIVEN BY QUALITY.</h2>
+    <p>Alsalmo BuildCorp is a <strong>growing construction company</strong> led by experienced professionals committed to quality and client satisfaction. We specialize in both residential and commercial construction, bringing reliability and precision to every job site.</p>
+    <p>From ground-breaking to final finishes, our team ensures every detail aligns with your goals — delivering structures that stand the test of time, on schedule and within budget.</p>
+    <div class="about-highlights">
+      <div class="about-hl">
+        <span class="about-hl-num">150+</span>
+        <span class="about-hl-txt">Projects Delivered</span>
+      </div>
+      <div class="about-hl">
+        <span class="about-hl-num">10+</span>
+        <span class="about-hl-txt">Years in Business</span>
+      </div>
+      <div class="about-hl">
+        <span class="about-hl-num">2</span>
+        <span class="about-hl-txt">Service Regions</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services-header">
+    <div class="gsap-reveal">
+      <div class="section-label">What We Do</div>
+      <h2 class="section-title">OUR <span class="accent">SERVICES</span></h2>
+    </div>
+    <p class="gsap-reveal" style="max-width:320px;font-size:0.85rem;color:var(--text-muted);line-height:1.85;">End-to-end construction and renovation services tailored for residential and commercial clients across Toronto &amp; GTA.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card gsap-scale">
+      <div class="service-num">01 —</div>
+      <div class="service-icon-wrap">
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M9 21V12h6v9"/><path d="M7 12h10"/></svg>
+      </div>
+      <div class="service-name">Residential Construction</div>
+      <div class="service-desc">Custom homes built to your specifications — from foundation to final finish. Quality materials, superior craftsmanship.</div>
+    </div>
+    <div class="service-card gsap-scale">
+      <div class="service-num">02 —</div>
+      <div class="service-icon-wrap">
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 20h16V8H4v12z"/><path d="M8 8v12"/><path d="M16 8v12"/><path d="M12 8v12"/><path d="M4 12h16"/></svg>
+      </div>
+      <div class="service-name">Commercial Construction</div>
+      <div class="service-desc">Office buildings, retail spaces, and commercial developments executed with precision and to code.</div>
+    </div>
+    <div class="service-card gsap-scale">
+      <div class="service-num">03 —</div>
+      <div class="service-icon-wrap">
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M20 7l-3 3-6-6 3-3 6 6z"/><path d="M8 16l-4 4 4 0 4-4-4-0z"/><path d="M6 18l8-8"/></svg>
+      </div>
+      <div class="service-name">Renovation &amp; Remodeling</div>
+      <div class="service-desc">Breathe new life into your existing space. Structural changes, expansions, and complete overhauls done right.</div>
+    </div>
+    <div class="service-card gsap-scale">
+      <div class="service-num">04 —</div>
+      <div class="service-icon-wrap">
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 12h16v8H4v-8z"/><path d="M4 12l8-8 8 8"/><path d="M12 4v16"/><path d="M7 16h10"/></svg>
+      </div>
+      <div class="service-name">Interior Finishing</div>
+      <div class="service-desc">Drywall, trim, millwork, and finishing touches that elevate every interior to a polished, premium standard.</div>
+    </div>
+    <div class="service-card gsap-scale">
+      <div class="service-num">05 —</div>
+      <div class="service-icon-wrap">
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M12 4v16"/><path d="M4 12h16"/><path d="M8 4v16"/><path d="M16 4v16"/></svg>
+      </div>
+      <div class="service-name">Flooring &amp; Tiling</div>
+      <div class="service-desc">Hardwood, laminate, ceramic, porcelain, and natural stone — installed with meticulous attention to detail.</div>
+    </div>
+    <div class="service-card gsap-scale">
+      <div class="service-num">06 —</div>
+      <div class="service-icon-wrap">
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M7 21l6-6 4 4-6 6-4-4z"/><path d="M13 15L9 11"/><path d="M14 4h6v4h-6z"/><path d="M9 4h4v6"/></svg>
+      </div>
+      <div class="service-name">Painting Services</div>
+      <div class="service-desc">Interior and exterior painting using premium products. Clean lines, lasting finishes, and minimal disruption.</div>
+    </div>
+    <div class="service-card gsap-scale">
+      <div class="service-num">07 —</div>
+      <div class="service-icon-wrap">
+        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M8 10h8"/><path d="M8 14h8"/><path d="M6 6l2-4h8l2 4"/></svg>
+      </div>
+      <div class="service-name">General Contracting</div>
+      <div class="service-desc">Full project management from permits to punchlist. We coordinate all trades, so you don't have to.</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <div class="stats-grid">
+    <div class="stat-item gsap-fade">
+      <span class="stat-num" data-target="150" data-suffix="+">0<span class="stat-suffix">+</span></span>
+      <div class="stat-name">Projects Completed</div>
+    </div>
+    <div class="stat-item gsap-fade">
+      <span class="stat-num" data-target="10" data-suffix="+">0<span class="stat-suffix">+</span></span>
+      <div class="stat-name">Years of Experience</div>
+    </div>
+    <div class="stat-item gsap-fade">
+      <span class="stat-num" data-target="98" data-suffix="%">0<span class="stat-suffix">%</span></span>
+      <div class="stat-name">Client Satisfaction Rate</div>
+    </div>
+    <div class="stat-item gsap-fade">
+      <span class="stat-num" data-target="7" data-suffix="">0<span class="stat-suffix"></span></span>
+      <div class="stat-name">Services Offered</div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICE AREAS -->
+<section id="areas">
+  <div class="areas-inner">
+    <div class="areas-map gsap-reveal-left">
+      <div class="map-title"><span class="icon-inline"><svg viewBox="0 0 24 24"><path d="M12 21s6-4.35 6-10a6 6 0 0 0-12 0c0 5.65 6 10 6 10z"/><circle cx="12" cy="11" r="2"/></svg></span> WE BUILD ACROSS</div>
+      <div class="area-chips">
+        <div class="area-chip"><div class="area-chip-dot"></div> Toronto</div>
+        <div class="area-chip"><div class="area-chip-dot"></div> Mississauga</div>
+        <div class="area-chip"><div class="area-chip-dot"></div> Brampton</div>
+        <div class="area-chip"><div class="area-chip-dot"></div> Markham</div>
+        <div class="area-chip"><div class="area-chip-dot"></div> Vaughan</div>
+        <div class="area-chip"><div class="area-chip-dot"></div> Oakville</div>
+        <div class="area-chip"><div class="area-chip-dot"></div> Richmond Hill</div>
+        <div class="area-chip"><div class="area-chip-dot"></div> Scarborough</div>
+        <div class="area-chip"><div class="area-chip-dot"></div> North York</div>
+        <div class="area-chip"><div class="area-chip-dot"></div> Etobicoke</div>
+        <div class="area-chip"><div class="area-chip-dot"></div> Ajax &amp; Pickering</div>
+      </div>
+      <div class="coverage-bar" style="margin-top:2rem;">
+        <div class="coverage-row">
+          <div class="coverage-label"><span>Toronto Core</span><span>Active</span></div>
+          <div class="coverage-track"><div class="coverage-fill" data-width="95"></div></div>
+        </div>
+        <div class="coverage-row">
+          <div class="coverage-label"><span>Greater Toronto Area</span><span>Active</span></div>
+          <div class="coverage-track"><div class="coverage-fill" data-width="88"></div></div>
+        </div>
+        <div class="coverage-row">
+          <div class="coverage-label"><span>Expanding Regions</span><span>Coming Soon</span></div>
+          <div class="coverage-track"><div class="coverage-fill" data-width="40"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="areas-text gsap-reveal-right">
+      <div class="section-label">Where We Operate</div>
+      <h2 class="section-title">SERVING <span class="accent">TORONTO</span><br>&amp; ALL OF GTA</h2>
+      <p>Alsalmo BuildCorp proudly serves homeowners, developers, and businesses throughout Toronto and the Greater Toronto Area. Our local knowledge and established supplier networks mean faster turnaround and competitive pricing.</p>
+      <p>Whether you're in the heart of downtown Toronto or the suburban communities of the GTA, our teams are ready to mobilize — bringing the same standard of quality workmanship regardless of location.</p>
+      <a href="#quote" class="btn-primary" style="margin-top:1rem;display:inline-block;">Check Your Area</a>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div class="portfolio-header" style="justify-content: center; flex-direction: column; align-items: center; text-align: center;">
+    <div class="gsap-reveal">
+      <div class="section-label" style="justify-content: center;">Our Transformation</div>
+      <h2 class="section-title">WORK <span class="accent" style="color: #8b5cf6;">PORTFOLIO</span></h2>
+    </div>
+  </div>
+  
+  <div class="portfolio-filter gsap-reveal" id="portfolioFilter">
+    <button class="filter-btn active" data-filter="all">All Projects</button>
+    <button class="filter-btn" data-filter="residential">Residential</button>
+    <button class="filter-btn" data-filter="commercial">Commercial</button>
+    <button class="filter-btn" data-filter="interior">Interior</button>
+    <button class="filter-btn" data-filter="exterior">Exterior</button>
+  </div>
+  
+  <div class="portfolio-grid" id="portfolioGrid">
+    <div class="compare-card gsap-scale" data-category="residential interior" style="--pos: 50%;">
+      <div class="compare-img compare-before" style="background-image: url('https://images.unsplash.com/photo-1556912167-f556f1f39fdf?w=800&q=80');">
+        <span class="compare-badge badge-before">Before</span>
+        <span class="compare-label label-before">Before: Old Kitchen</span>
+      </div>
+      <div class="compare-img compare-after" style="background-image: url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80');">
+        <span class="compare-badge badge-after">After</span>
+        <span class="compare-label label-after">After: Modern Kitchen</span>
+      </div>
+      <div class="compare-handle">
+        <div class="handle-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 9l-4 3 4 3"/><path d="M16 15l4-3-4-3"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+        </div>
+      </div>
+    </div>
+    
+    <div class="compare-card gsap-scale" data-category="commercial interior" style="--pos: 50%;">
+      <div class="compare-img compare-before" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80');">
+        <span class="compare-badge badge-before">Before</span>
+        <span class="compare-label label-before">Before: Old Office</span>
+      </div>
+      <div class="compare-img compare-after" style="background-image: url('https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&q=80');">
+        <span class="compare-badge badge-after">After</span>
+        <span class="compare-label label-after">After: Modern Workspace</span>
+      </div>
+      <div class="compare-handle">
+        <div class="handle-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 9l-4 3 4 3"/><path d="M16 15l4-3-4-3"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+        </div>
+      </div>
+    </div>
+    
+    <div class="compare-card gsap-scale" data-category="residential exterior" style="--pos: 50%;">
+      <div class="compare-img compare-before" style="background-image: url('https://images.unsplash.com/photo-1512915922686-57c11dde9b6b?w=800&q=80');">
+        <span class="compare-badge badge-before">Before</span>
+        <span class="compare-label label-before">Before: Old Paint</span>
+      </div>
+      <div class="compare-img compare-after" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80');">
+        <span class="compare-badge badge-after">After</span>
+        <span class="compare-label label-after">After: Fresh Exterior</span>
+      </div>
+      <div class="compare-handle">
+        <div class="handle-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 9l-4 3 4 3"/><path d="M16 15l4-3-4-3"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+        </div>
+      </div>
+    </div>
+    
+    <div class="compare-card gsap-scale" data-category="residential interior" style="--pos: 50%;">
+      <div class="compare-img compare-before" style="background-image: url('https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80');">
+        <span class="compare-badge badge-before">Before</span>
+        <span class="compare-label label-before">Before: Outdated Bath</span>
+      </div>
+      <div class="compare-img compare-after" style="background-image: url('https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80');">
+        <span class="compare-badge badge-after">After</span>
+        <span class="compare-label label-after">After: Luxury Bath</span>
+      </div>
+      <div class="compare-handle">
+        <div class="handle-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 9l-4 3 4 3"/><path d="M16 15l4-3-4-3"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+        </div>
+      </div>
+    </div>
+    
+    <div class="compare-card gsap-scale" data-category="residential interior" style="--pos: 50%;">
+      <div class="compare-img compare-before" style="background-image: url('https://images.unsplash.com/photo-1554995207-c18c203602cb?w=800&q=80');">
+        <span class="compare-badge badge-before">Before</span>
+        <span class="compare-label label-before">Before: Empty Room</span>
+      </div>
+      <div class="compare-img compare-after" style="background-image: url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=800&q=80');">
+        <span class="compare-badge badge-after">After</span>
+        <span class="compare-label label-after">After: Cozy Living Area</span>
+      </div>
+      <div class="compare-handle">
+        <div class="handle-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 9l-4 3 4 3"/><path d="M16 15l4-3-4-3"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+        </div>
+      </div>
+    </div>
+    
+    <div class="compare-card gsap-scale" data-category="commercial interior" style="--pos: 50%;">
+      <div class="compare-img compare-before" style="background-image: url('https://images.unsplash.com/photo-1588854337236-6889d631faa8?w=800&q=80');">
+        <span class="compare-badge badge-before">Before</span>
+        <span class="compare-label label-before">Before: Raw Finish</span>
+      </div>
+      <div class="compare-img compare-after" style="background-image: url('https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&q=80');">
+        <span class="compare-badge badge-after">After</span>
+        <span class="compare-label label-after">After: Finished Basement</span>
+      </div>
+      <div class="compare-handle">
+        <div class="handle-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 9l-4 3 4 3"/><path d="M16 15l4-3-4-3"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="portfolio-header" style="justify-content: center; flex-direction: column; align-items: center; text-align: center; margin-top: 5rem;">
+    <div class="gsap-reveal">
+      <div class="section-label" style="justify-content: center;">Final Results</div>
+      <h2 class="section-title">COMPLETED <span class="accent" style="color: #8b5cf6;">BUILDS</span></h2>
+    </div>
+  </div>
+  
+  <div class="regular-portfolio-grid gsap-reveal">
+    <div class="portfolio-item">
+      <div class="portfolio-item-img" style="background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80');"></div>
+      <div class="portfolio-item-info">
+        <div class="portfolio-item-cat">Residential Exterior</div>
+        <h3 class="portfolio-item-title">Modern Luxury Villa</h3>
+      </div>
+    </div>
+    
+    <div class="portfolio-item">
+      <div class="portfolio-item-img" style="background-image: url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80');"></div>
+      <div class="portfolio-item-info">
+        <div class="portfolio-item-cat">Interior Build</div>
+        <h3 class="portfolio-item-title">Minimalist Kitchen</h3>
+      </div>
+    </div>
+    
+    <div class="portfolio-item">
+      <div class="portfolio-item-img" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80');"></div>
+      <div class="portfolio-item-info">
+        <div class="portfolio-item-cat">Commercial</div>
+        <h3 class="portfolio-item-title">Downtown Tech Office</h3>
+      </div>
+    </div>
+    
+    <div class="portfolio-item">
+      <div class="portfolio-item-img" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80');"></div>
+      <div class="portfolio-item-info">
+        <div class="portfolio-item-cat">General Contracting</div>
+        <h3 class="portfolio-item-title">Suburban Renewal</h3>
+      </div>
+    </div>
+    
+    <div class="portfolio-item">
+      <div class="portfolio-item-img" style="background-image: url('https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80');"></div>
+      <div class="portfolio-item-info">
+        <div class="portfolio-item-cat">Bathroom Renovation</div>
+        <h3 class="portfolio-item-title">Spa Style En-suite</h3>
+      </div>
+    </div>
+    
+    <div class="portfolio-item">
+      <div class="portfolio-item-img" style="background-image: url('https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80');"></div>
+      <div class="portfolio-item-info">
+        <div class="portfolio-item-cat">Residential</div>
+        <h3 class="portfolio-item-title">Open Concept Living</h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div style="text-align:center;margin-bottom:0.5rem;" class="gsap-reveal">
+    <div class="section-label" style="justify-content:center;">Client Reviews</div>
+    <h2 class="section-title">WHAT OUR CLIENTS <span class="accent">SAY</span></h2>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card gsap-reveal">
+      <div class="stars"><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg empty-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg></div>
+      <p class="testimonial-text">"Alsalmo BuildCorp exceeded every expectation. Our home renovation was completed on schedule and the quality of work is outstanding. The team was professional and communicative throughout the entire process."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">MK</div>
+        <div>
+          <div class="author-name">Mohammed K.</div>
+          <div class="author-role">Homeowner — Toronto</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card gsap-reveal">
+      <div class="stars"><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg half-star" viewBox="0 0 24 24"><defs><linearGradient id="halfGrad"><stop offset="50%" stop-color="currentColor"/><stop offset="50%" stop-color="transparent"/></linearGradient></defs><path fill="url(#halfGrad)" stroke="currentColor" d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg></div>
+      <p class="testimonial-text">"We hired Alsalmo for our commercial fit-out in Brampton. They managed everything from permits to final inspection. Cost-effective, reliable, and the finish is impeccable. Highly recommended."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">SR</div>
+        <div>
+          <div class="author-name">Sarah R.</div>
+          <div class="author-role">Business Owner — Brampton</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card gsap-reveal">
+      <div class="stars"><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg></div>
+      <p class="testimonial-text">"Flooring and painting services were both done to perfection. The crew was clean, fast, and the pricing was fair and transparent. No surprises, just quality results. Will be using them again."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">DL</div>
+        <div>
+          <div class="author-name">David L.</div>
+          <div class="author-role">Property Developer — Markham</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card gsap-reveal">
+      <div class="stars"><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg half-star" viewBox="0 0 24 24"><defs><linearGradient id="halfGrad"><stop offset="50%" stop-color="currentColor"/><stop offset="50%" stop-color="transparent"/></linearGradient></defs><path fill="url(#halfGrad)" stroke="currentColor" d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg></div>
+      <p class="testimonial-text">"Our basement renovation was a dream come true. Alsalmo's team listened to every detail of our vision and brought it to life beautifully. The project wrapped up ahead of schedule — incredible work."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">AF</div>
+        <div>
+          <div class="author-name">Aisha F.</div>
+          <div class="author-role">Homeowner — North York</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card gsap-reveal">
+      <div class="stars"><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg empty-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg></div>
+      <p class="testimonial-text">"General contracting done right. Alsalmo coordinated every trade, kept us updated daily, and delivered a commercial space that is better than what we imagined. True professionals."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">TP</div>
+        <div>
+          <div class="author-name">Tom P.</div>
+          <div class="author-role">Retail Manager — Vaughan</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card gsap-reveal">
+      <div class="stars"><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg><svg class="icon-svg full-star" viewBox="0 0 24 24"><path d="M12 17.3l-5.7 3 1.1-6.5L2 9.7l6.6-1L12 3l3.4 5.7 6.6 1-4.4 4.1 1.1 6.5z"/></svg></div>
+      <p class="testimonial-text">"From the initial quote to the final walkthrough, Alsalmo BuildCorp was transparent, fair, and delivered exceptional value. The tiling work in our bathroom is absolutely flawless."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">NB</div>
+        <div>
+          <div class="author-name">Nadia B.</div>
+          <div class="author-role">Homeowner — Mississauga</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE FORM -->
+<section id="quote">
+  <div class="quote-bg-accent"></div>
+  <div class="quote-inner">
+    <div class="quote-info gsap-reveal-left">
+      <div class="section-label">Get Started</div>
+      <h2 class="section-title">REQUEST A <span class="accent">FREE</span><br>QUOTATION</h2>
+      <p>Tell us about your project and we'll get back to you within 24 hours with a detailed, no-obligation quote. Our estimators serve all of Toronto and the GTA.</p>
+      <div class="quote-perks">
+        <div class="quote-perk"><div class="perk-check icon-inline"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>Free, no-obligation estimate</div>
+        <div class="quote-perk"><div class="perk-check icon-inline"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>Response within 24 hours</div>
+        <div class="quote-perk"><div class="perk-check icon-inline"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>Transparent, itemized pricing</div>
+        <div class="quote-perk"><div class="perk-check icon-inline"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>Serving Toronto &amp; all GTA</div>
+        <div class="quote-perk"><div class="perk-check icon-inline"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>Licensed &amp; insured contractors</div>
+        <div class="quote-perk"><div class="perk-check icon-inline"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>On-site consultation available</div>
+      </div>
+    </div>
+    <div class="quote-form gsap-reveal-right" id="quoteFormWrap">
+      <div id="quoteFormBody">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name *</label>
+            <input type="text" id="fname" placeholder="John" required>
+          </div>
+          <div class="form-group">
+            <label>Last Name *</label>
+            <input type="text" id="lname" placeholder="Smith" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" id="email" placeholder="john@email.com" required>
+          </div>
+          <div class="form-group">
+            <label>Phone Number *</label>
+            <input type="tel" id="phone" placeholder="(416) 000-0000" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Project Type *</label>
+            <select id="projectType">
+              <option value="">Select service...</option>
+              <option>Residential Construction</option>
+              <option>Commercial Construction</option>
+              <option>Renovation &amp; Remodeling</option>
+              <option>Interior Finishing</option>
+              <option>Flooring &amp; Tiling</option>
+              <option>Painting Services</option>
+              <option>General Contracting</option>
+              <option>Multiple Services</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Estimated Budget</label>
+            <select id="budget">
+              <option value="">Select range...</option>
+              <option>Under $10,000</option>
+              <option>$10,000 – $25,000</option>
+              <option>$25,000 – $50,000</option>
+              <option>$50,000 – $100,000</option>
+              <option>$100,000 – $250,000</option>
+              <option>$250,000+</option>
+              <option>Not sure yet</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Project Location / City *</label>
+            <select id="location">
+              <option value="">Select area...</option>
+              <option>Toronto (Downtown)</option>
+              <option>North York</option>
+              <option>Scarborough</option>
+              <option>Etobicoke</option>
+              <option>Mississauga</option>
+              <option>Brampton</option>
+              <option>Markham</option>
+              <option>Vaughan</option>
+              <option>Richmond Hill</option>
+              <option>Oakville</option>
+              <option>Ajax / Pickering</option>
+              <option>Other GTA City</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Project Timeline</label>
+            <select id="timeline">
+              <option value="">When to start?</option>
+              <option>ASAP (within 1 month)</option>
+              <option>1–3 months</option>
+              <option>3–6 months</option>
+              <option>6–12 months</option>
+              <option>Planning stage</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Property Type</label>
+            <select id="propType">
+              <option value="">Select type...</option>
+              <option>Single Family Home</option>
+              <option>Townhouse / Semi-Detached</option>
+              <option>Condo / Apartment</option>
+              <option>Retail / Shop</option>
+              <option>Office / Commercial</option>
+              <option>Industrial / Warehouse</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>How Did You Hear About Us?</label>
+            <select id="source">
+              <option value="">Select...</option>
+              <option>Google Search</option>
+              <option>Referral / Word of Mouth</option>
+              <option>Social Media</option>
+              <option>Kijiji / HomeStars</option>
+              <option>Flyer / Signage</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-full">
+          <div class="form-group">
+            <label>Services Needed</label>
+            <div class="form-check-grid">
+              <label class="form-check"><input type="checkbox"> Residential Construction</label>
+              <label class="form-check"><input type="checkbox"> Commercial Construction</label>
+              <label class="form-check"><input type="checkbox"> Renovation &amp; Remodeling</label>
+              <label class="form-check"><input type="checkbox"> Interior Finishing</label>
+              <label class="form-check"><input type="checkbox"> Flooring &amp; Tiling</label>
+              <label class="form-check"><input type="checkbox"> Painting Services</label>
+              <label class="form-check"><input type="checkbox"> General Contracting</label>
+              <label class="form-check"><input type="checkbox"> Not sure yet</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-full">
+          <div class="form-group">
+            <label>Project Address / Postal Code</label>
+            <input type="text" id="address" placeholder="e.g. 123 Main St, Toronto, M5V 1A1">
+          </div>
+        </div>
+        <div class="form-full">
+          <div class="form-group">
+            <label>Project Description *</label>
+            <textarea id="description" placeholder="Please describe your project in as much detail as possible. Include scope, any special requirements, materials preferences, or anything else relevant..." style="min-height:110px;"></textarea>
+          </div>
+        </div>
+        <div class="form-full">
+          <div class="form-group">
+            <label>Additional Notes or Questions</label>
+            <textarea id="notes" placeholder="Any questions, special circumstances, or extra context for our team..." style="min-height:70px;"></textarea>
+          </div>
+        </div>
+        <button class="form-submit" onclick="submitForm()">Submit Quote Request →</button>
+      </div>
+      <div class="form-success" id="formSuccess">
+        <div class="success-icon icon-inline"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M7 13l3 3 7-7"/></svg></div>
+        <div class="success-title">QUOTE REQUEST SENT!</div>
+        <p class="success-msg">Thank you for reaching out to Alsalmo BuildCorp. Our team will review your project details and get back to you within <strong>24 hours</strong>.</p>
+        <p class="success-msg" style="margin-top:0.8rem;">In the meantime, feel free to explore our portfolio.</p>
+        <a href="#portfolio" class="btn-outline" style="margin-top:1.5rem;display:inline-block;">View Our Work</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="gsap-reveal">
+      <div class="footer-brand-name">ALSALMO <span>BUILD</span>CORP</div>
+      <div class="footer-tagline">Building Trust. Delivering Quality.</div>
+      <p class="footer-about">A growing construction company led by experienced professionals committed to quality and client satisfaction across Toronto and the GTA.</p>
+    </div>
+    <div class="gsap-reveal">
+      <div class="footer-col-title">Quick Links</div>
+      <ul class="footer-links">
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#areas">Service Areas</a></li>
+        <li><a href="#portfolio">Work Portfolio</a></li>
+        <li><a href="#testimonials">Client Reviews</a></li>
+        <li><a href="#quote">Get a Quote</a></li>
+      </ul>
+    </div>
+    <div class="gsap-reveal">
+      <div class="footer-col-title">Services</div>
+      <ul class="footer-links">
+        <li><a href="#services">Residential Construction</a></li>
+        <li><a href="#services">Commercial Construction</a></li>
+        <li><a href="#services">Renovation &amp; Remodeling</a></li>
+        <li><a href="#services">Interior Finishing</a></li>
+        <li><a href="#services">Flooring &amp; Tiling</a></li>
+        <li><a href="#services">Painting Services</a></li>
+        <li><a href="#services">General Contracting</a></li>
+      </ul>
+    </div>
+    <div class="gsap-reveal">
+      <div class="footer-col-title">Contact</div>
+      <div class="footer-contact">
+        <div class="footer-contact-item">
+          <span class="fc-icon icon-inline"><svg viewBox="0 0 24 24"><path d="M12 21s6-4.35 6-10a6 6 0 0 0-12 0c0 5.65 6 10 6 10z"/><circle cx="12" cy="11" r="2"/></svg></span>
+          <span>Toronto &amp; Greater Toronto Area, Ontario, Canada</span>
+        </div>
+        <div class="footer-contact-item">
+          <span class="fc-icon icon-inline"><svg viewBox="0 0 24 24"><path d="M4 4h4l2 5-2 2 4 4 2-2 5 2v4H4z"/></svg></span>
+          <span>(416) 000-0000</span>
+        </div>
+        <div class="footer-contact-item">
+          <span class="fc-icon icon-inline"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M4 8l8 5 8-5"/></svg></span>
+          <span>info@alsalmobuildcorp.com</span>
+        </div>
+        <div class="footer-contact-item">
+          <span class="fc-icon icon-inline"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 3"/></svg></span>
+          <span>Mon–Fri: 7AM–6PM<br>Sat: 8AM–4PM</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 <strong>Alsalmo BuildCorp</strong>. All rights reserved. Licensed &amp; Insured.</div>
+    <div class="footer-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Sitemap</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ─── GSAP SETUP ─── */
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+  /* ─── HERO ENTRANCE ANIMATION ─── */
+  const heroTl = gsap.timeline({ delay: 0.2 });
+  heroTl
+    .to('#heroBadge', { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' })
+    .to('#heroTitle', { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' }, '-=0.4')
+    .to('#heroTagline', { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.55')
+    .to('#heroDesc', { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.5')
+    .to('#heroBtns', { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.45')
+    .to('#heroStats', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.3')
+    .to('#scrollCue', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.2');
+
+  /* Parallax on hero grid bg */
+  gsap.to('.hero-grid-bg', {
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 },
+    y: 80, ease: 'none'
+  });
+
+  /* ─── SCROLL REVEAL: gsap-reveal (fade up) ─── */
+  gsap.utils.toArray('.gsap-reveal').forEach((el, i) => {
+    gsap.to(el, {
+      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+      opacity: 1, y: 0, duration: 0.85,
+      ease: 'power3.out',
+      delay: (i % 3) * 0.1
+    });
+  });
+
+  /* ─── SCROLL REVEAL: left / right ─── */
+  gsap.utils.toArray('.gsap-reveal-left').forEach(el => {
+    gsap.to(el, {
+      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+      opacity: 1, x: 0, duration: 0.9, ease: 'power3.out'
+    });
+  });
+  gsap.utils.toArray('.gsap-reveal-right').forEach(el => {
+    gsap.to(el, {
+      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+      opacity: 1, x: 0, duration: 0.9, ease: 'power3.out'
+    });
+  });
+
+  /* ─── SERVICE CARDS — staggered scale in ─── */
+  gsap.to('.service-card.gsap-scale', {
+    scrollTrigger: { trigger: '.services-grid', start: 'top 85%', toggleActions: 'play none none none' },
+    opacity: 1, scale: 1, duration: 0.7, ease: 'power3.out',
+    stagger: { amount: 0.5, from: 'start' }
+  });
+
+  /* ─── PORTFOLIO CARDS — staggered ─── */
+  gsap.to('.compare-card.gsap-scale', {
+    scrollTrigger: { trigger: '.portfolio-grid', start: 'top 85%', toggleActions: 'play none none none' },
+    opacity: 1, scale: 1, duration: 0.75, ease: 'power3.out',
+    stagger: { amount: 0.45, from: 'start' }
+  });
+
+  /* ─── BEFORE/AFTER SLIDER LOGIC ─── */
+  const compareCards = document.querySelectorAll('.compare-card');
+  
+  compareCards.forEach(card => {
+    let isDown = false;
+    
+    const move = (e) => {
+      if(!isDown) return;
+      const rect = card.getBoundingClientRect();
+      let x = 0;
+      if (e.type.includes('touch')) {
+        x = e.touches[0].clientX - rect.left;
+      } else {
+        x = e.clientX - rect.left;
+      }
+      let pos = Math.max(0, Math.min(x / rect.width, 1)) * 100;
+      card.style.setProperty('--pos', pos + '%');
+    };
+    
+    card.addEventListener('mousedown', () => { isDown = true; card.style.cursor = 'ew-resize'; });
+    card.addEventListener('touchstart', () => { isDown = true; }, {passive: true});
+    
+    window.addEventListener('mouseup', () => { isDown = false; card.style.cursor = 'default'; });
+    window.addEventListener('touchend', () => { isDown = false; });
+    
+    window.addEventListener('mousemove', move);
+    window.addEventListener('touchmove', move, {passive: true});
+  });
+
+  /* ─── PORTFOLIO FILTERING ─── */
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Remove active class
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const filter = btn.getAttribute('data-filter');
+      compareCards.forEach(card => {
+        if(filter === 'all' || card.getAttribute('data-category').includes(filter)) {
+          card.classList.remove('hide');
+          gsap.fromTo(card, {scale: 0.9, opacity: 0}, {scale: 1, opacity: 1, duration: 0.4});
+        } else {
+          card.classList.add('hide');
+        }
+      });
+      ScrollTrigger.refresh();
+    });
+  });
+
+  /* ─── STATS COUNTER ANIMATION ─── */
+  const statItems = document.querySelectorAll('.stat-item.gsap-fade');
+  let statsAnimated = false;
+
+  ScrollTrigger.create({
+    trigger: '#stats',
+    start: 'top 80%',
+    onEnter: () => {
+      if (statsAnimated) return;
+      statsAnimated = true;
+      gsap.to('.stat-item.gsap-fade', {
+        opacity: 1, duration: 0.6, ease: 'power2.out',
+        stagger: 0.12
+      });
+      statItems.forEach(item => {
+        const numEl = item.querySelector('.stat-num');
+        const target = parseInt(numEl.dataset.target);
+        const suffix = numEl.dataset.suffix;
+        const suffixEl = numEl.querySelector('.stat-suffix');
+        let obj = { val: 0 };
+        gsap.to(obj, {
+          val: target, duration: 2, ease: 'power2.out',
+          onUpdate: () => {
+            numEl.childNodes[0].textContent = Math.floor(obj.val);
+            suffixEl.textContent = suffix;
+          }
+        });
+      });
+    }
+  });
+
+  /* ─── TESTIMONIAL CARDS stagger ─── */
+  gsap.to('.testimonial-card.gsap-reveal', {
+    scrollTrigger: { trigger: '.testimonials-grid', start: 'top 85%', toggleActions: 'play none none none' },
+    opacity: 1, y: 0, duration: 0.75, ease: 'power3.out',
+    stagger: { amount: 0.5 }
+  });
+
+  /* ─── COVERAGE BARS ─── */
+  document.querySelectorAll('.coverage-fill').forEach(fill => {
+    const w = fill.dataset.width;
+    ScrollTrigger.create({
+      trigger: fill,
+      start: 'top 90%',
+      onEnter: () => {
+        gsap.to(fill, { width: w + '%', duration: 1.4, ease: 'power3.out' });
+      }
+    });
+  });
+
+  /* ─── ABOUT HIGHLIGHTS count-up ─── */
+  const hlNums = document.querySelectorAll('.about-hl-num');
+  let hlAnimated = false;
+  ScrollTrigger.create({
+    trigger: '.about-highlights',
+    start: 'top 85%',
+    onEnter: () => {
+      if (hlAnimated) return;
+      hlAnimated = true;
+      hlNums.forEach(el => {
+        const text = el.textContent.trim();
+        const num = parseInt(text);
+        const suffix = text.replace(num, '');
+        let obj = { val: 0 };
+        gsap.to(obj, {
+          val: num, duration: 1.5, ease: 'power2.out',
+          onUpdate: () => { el.textContent = Math.floor(obj.val) + suffix; }
+        });
+      });
+    }
+  });
+
+  /* ─── NAV SCROLL EFFECT ─── */
+  ScrollTrigger.create({
+    start: 60,
+    onUpdate: self => {
+      const nav = document.getElementById('mainNav');
+      if (self.progress > 0) nav.classList.add('scrolled');
+      else nav.classList.remove('scrolled');
+    }
+  });
+
+  /* ─── SMOOTH SCROLL (GSAP) ─── */
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        gsap.to(window, { scrollTo: { y: target, offsetY: 70 }, duration: 1, ease: 'power3.inOut' });
+      }
+    });
+  });
+
+  /* ─── GEO PARALLAX ─── */
+  gsap.to('.geo-1', {
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 2 },
+    y: -60, rotation: 25, ease: 'none'
+  });
+  gsap.to('.geo-2', {
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 3 },
+    y: -40, ease: 'none'
+  });
+
+  /* ─── FOOTER REVEAL ─── */
+  gsap.to('footer .gsap-reveal', {
+    scrollTrigger: { trigger: 'footer', start: 'top 90%', toggleActions: 'play none none none' },
+    opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.12
+  });
+
+  /* ─── PORTFOLIO FILTER ─── */
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  /* ─── FORM SUBMIT ─── */
+  function submitForm() {
+    const fname = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const projectType = document.getElementById('projectType').value;
+    const description = document.getElementById('description').value.trim();
+    if (!fname || !email || !phone || !projectType || !description) {
+      alert('Please fill in all required fields (*) before submitting.');
+      return;
+    }
+    gsap.to('#quoteFormBody', { opacity: 0, y: -20, duration: 0.4, ease: 'power2.in', onComplete: () => {
+      document.getElementById('quoteFormBody').style.display = 'none';
+      const success = document.getElementById('formSuccess');
+      success.classList.add('show');
+      gsap.from(success, { opacity: 0, y: 20, duration: 0.5, ease: 'power3.out' });
+      document.getElementById('quoteFormWrap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }});
+  }
+
+  /* ─── MOBILE MENU ─── */
+  function toggleMobile() {
+    const ham = document.getElementById('hamburger');
+    const menu = document.getElementById('mobileMenu');
+    ham.classList.toggle('open');
+    menu.classList.toggle('open');
+    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  }
+  function closeMobile() {
+    document.getElementById('hamburger').classList.remove('open');
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+</script>
+</body>
+</html>
